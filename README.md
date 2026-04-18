@@ -30,6 +30,12 @@ O projeto segue uma arquitetura separada entre frontend e backend:
 - **Backend:** Node.js  
 - **Banco de Dados:** PostgreSQL  
 
+## 🎥 Demonstração
+
+
+https://github.com/user-attachments/assets/099e7fa9-4fc1-4268-95ac-072a548975b3
+
+
 ## 📈 Possíveis Melhorias Futuras
 
 - Sistema de recomendações de treino  
