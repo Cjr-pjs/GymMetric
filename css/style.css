@@ -351,6 +351,34 @@ textarea.input { resize: vertical; min-height: 2.5rem; }
   flex-shrink: 0;
 }
 
+/* Exercise section header in routine modal */
+.exercise-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.col-header {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.exercise-row--header {
+  margin-bottom: 0.25rem;
+  padding: 0 0.25rem;
+}
+
 /* Exercise rows in routine editor */
 .exercise-row {
   display: grid;

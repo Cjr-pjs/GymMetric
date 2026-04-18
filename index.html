@@ -104,17 +104,17 @@
           <textarea class="input" id="routine-description" rows="2" placeholder="What is this routine for?"></textarea>
         </div>
 
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
-          <label style="font-size:.8rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.4px;">Exercises</label>
+        <div class="exercise-section-header">
+          <label class="field-label">Exercises</label>
           <button class="btn btn--outline btn--sm" onclick="addExerciseRow()">+ Add Exercise</button>
         </div>
 
         <!-- Exercise row column headers -->
-        <div style="display:grid;grid-template-columns:1fr 60px 90px 110px auto;gap:.5rem;margin-bottom:.25rem;padding:0 .25rem;">
-          <span style="font-size:.7rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">Exercise</span>
-          <span style="font-size:.7rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">Sets</span>
-          <span style="font-size:.7rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">Reps</span>
-          <span style="font-size:.7rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">Weight</span>
+        <div class="exercise-row exercise-row--header">
+          <span class="col-header">Exercise</span>
+          <span class="col-header">Sets</span>
+          <span class="col-header">Reps</span>
+          <span class="col-header">Weight</span>
           <span></span>
         </div>
 

@@ -43,7 +43,7 @@ function showToast(message, type = "success") {
   }, 3000);
 }
 
-function confirm(message) {
+function showConfirmDialog(message) {
   return window.confirm(message);
 }
 
@@ -217,7 +217,7 @@ function saveRoutine() {
 }
 
 function deleteRoutine(id) {
-  if (!confirm("Delete this routine?")) return;
+  if (!showConfirmDialog("Delete this routine?")) return;
   WorkoutManager.deleteRoutine(id);
   showToast("Routine deleted.");
   renderRoutines();
@@ -283,7 +283,7 @@ function renderActiveWorkout() {
         `).join("")}
       </div>
       <div class="set-input-row">
-        <input class="input input--sm" type="number" placeholder="Reps" id="reps-${exIdx}" min="1" value="${ex.targetReps.split('-')[0]}" />
+        <input class="input input--sm" type="number" placeholder="Reps" id="reps-${exIdx}" min="1" value="${parseInt(ex.targetReps, 10) || 10}" />
         <input class="input input--sm" type="number" placeholder="Weight (lbs)" id="weight-${exIdx}" min="0" />
         <button class="btn btn--primary btn--sm" onclick="logSet(${exIdx})">+ Log Set</button>
       </div>
@@ -322,7 +322,7 @@ function finishWorkout() {
 
   const hasData = w.exercises.some(ex => ex.sets.length > 0);
   if (!hasData) {
-    if (!confirm("You haven't logged any sets. Save the workout anyway?")) return;
+    if (!showConfirmDialog("You haven't logged any sets. Save the workout anyway?")) return;
   }
 
   const durationMinutes = State.activeWorkoutStart
@@ -348,7 +348,7 @@ function finishWorkout() {
 }
 
 function cancelWorkout() {
-  if (!confirm("Discard this workout session?")) return;
+  if (!showConfirmDialog("Discard this workout session?")) return;
   clearInterval(State.timerInterval);
   State.activeWorkout = null;
   State.activeWorkoutStart = null;
@@ -392,7 +392,7 @@ function renderLog() {
 }
 
 function deleteLog(id) {
-  if (!confirm("Delete this log entry?")) return;
+  if (!showConfirmDialog("Delete this log entry?")) return;
   WorkoutManager.deleteLog(id);
   showToast("Log entry deleted.");
   renderLog();
