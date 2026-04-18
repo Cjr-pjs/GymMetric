@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+:root {
+	font-family: 'Manrope', sans-serif;
+	color: #e6e6e6;
+	background-color: #191919;
+}
+
+body {
+	margin: 0;
+	min-width: 320px;
+	min-height: 100vh;
+	background: #191919;
+	color: #e6e6e6;
+}
+
+#root {
+	min-height: 100vh;
+}
+
+.bg-app-gradient {
+	background:
+		radial-gradient(circle at 12% 20%, rgba(91, 124, 255, 0.15), transparent 35%),
+		radial-gradient(circle at 88% 12%, rgba(108, 85, 180, 0.12), transparent 30%),
+		linear-gradient(135deg, #191919 0%, #1d1d1f 55%, #171717 100%);
+}
