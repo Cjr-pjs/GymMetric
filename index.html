@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GymMetric – The facilitator of your exercise routine." />
+  <title>GymMetric</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ── App Header / Nav ──────────────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="logo">
+      <span class="logo__icon">🏋</span>
+      GymMetric
+    </div>
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <a href="#" class="nav__link" data-view="dashboard">Dashboard</a>
+      <a href="#" class="nav__link" data-view="routines">Routines</a>
+      <a href="#" class="nav__link" data-view="log">History</a>
+      <a href="#" class="nav__link" data-view="exercises">Exercises</a>
+    </nav>
+  </header>
+
+  <!-- ── Main Content ──────────────────────────────────────────────────────── -->
+  <main class="main-content">
+
+    <!-- Dashboard View -->
+    <section id="view-dashboard" class="view" aria-label="Dashboard">
+      <div class="view-header">
+        <h1 class="view-title">Dashboard</h1>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card__value" id="stat-total">0</div>
+          <div class="stat-card__label">Total Workouts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__value" id="stat-week">0</div>
+          <div class="stat-card__label">This Week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__value" id="stat-avg">—</div>
+          <div class="stat-card__label">Avg Duration</div>
+        </div>
+      </div>
+
+      <h2 class="section-title">Recent Workouts</h2>
+      <div id="recent-workouts"></div>
+    </section>
+
+    <!-- Routines View -->
+    <section id="view-routines" class="view" aria-label="Routines">
+      <div class="view-header">
+        <h1 class="view-title">My Routines</h1>
+        <button class="btn btn--primary" onclick="openNewRoutine()">+ New Routine</button>
+      </div>
+      <div class="routines-grid" id="routines-list"></div>
+    </section>
+
+    <!-- History / Log View -->
+    <section id="view-log" class="view" aria-label="Workout History">
+      <div class="view-header">
+        <h1 class="view-title">Workout History</h1>
+      </div>
+      <div id="log-list"></div>
+    </section>
+
+    <!-- Exercise Browser View -->
+    <section id="view-exercises" class="view" aria-label="Exercise Library">
+      <div class="view-header">
+        <h1 class="view-title">Exercise Library</h1>
+      </div>
+      <div class="exercise-filters">
+        <input class="input" type="search" id="exercise-search" placeholder="Search exercises…" aria-label="Search exercises" />
+        <select class="input" id="exercise-category-filter" aria-label="Filter by category">
+          <option value="">All categories</option>
+        </select>
+        <select class="input" id="exercise-equipment-filter" aria-label="Filter by equipment">
+          <option value="">All equipment</option>
+        </select>
+      </div>
+      <div class="exercise-grid" id="exercise-grid"></div>
+    </section>
+
+  </main>
+
+  <!-- ── Routine Editor Modal ───────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="routine-modal" role="dialog" aria-modal="true" aria-labelledby="routine-modal-title">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 class="modal__title" id="routine-modal-title">New Routine</h2>
+        <button class="modal__close" onclick="closeRoutineModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="modal__body">
+        <div class="form-group">
+          <label for="routine-name">Routine Name</label>
+          <input class="input" type="text" id="routine-name" placeholder="e.g. Push Day, Full Body" />
+        </div>
+        <div class="form-group">
+          <label for="routine-description">Description (optional)</label>
+          <textarea class="input" id="routine-description" rows="2" placeholder="What is this routine for?"></textarea>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+          <label style="font-size:.8rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.4px;">Exercises</label>
+          <button class="btn btn--outline btn--sm" onclick="addExerciseRow()">+ Add Exercise</button>
+        </div>
+
+        <!-- Exercise row column headers -->
+        <div style="display:grid;grid-template-columns:1fr 60px 90px 110px auto;gap:.5rem;margin-bottom:.25rem;padding:0 .25rem;">
+          <span style="font-size:.7rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">Exercise</span>
+          <span style="font-size:.7rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">Sets</span>
+          <span style="font-size:.7rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">Reps</span>
+          <span style="font-size:.7rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;">Weight</span>
+          <span></span>
+        </div>
+
+        <div id="routine-exercises"></div>
+
+        <!-- Suggestions datalist for exercise name input -->
+        <datalist id="exercise-suggestions"></datalist>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--outline" onclick="closeRoutineModal()">Cancel</button>
+        <button class="btn btn--primary" onclick="saveRoutine()">Save Routine</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Active Workout Overlay ─────────────────────────────────────────────── -->
+  <div class="active-workout-overlay" id="active-workout-overlay" role="dialog" aria-modal="true" aria-label="Active workout session">
+    <div class="active-workout-header">
+      <h2 id="active-workout-title">Workout</h2>
+      <div class="workout-timer" id="workout-timer" aria-live="polite" aria-label="Elapsed time">00:00</div>
+      <div class="workout-actions">
+        <button class="btn btn--outline" style="border-color:rgba(255,255,255,.5);color:#fff;" onclick="cancelWorkout()">Discard</button>
+        <button class="btn btn--success btn--lg" onclick="finishWorkout()">✓ Finish</button>
+      </div>
+    </div>
+    <div class="active-workout-body" id="active-workout-exercises"></div>
+    <div class="active-workout-footer">
+      <button class="btn btn--outline" onclick="cancelWorkout()">Discard Workout</button>
+      <button class="btn btn--success btn--lg" onclick="finishWorkout()">✓ Finish &amp; Save</button>
+    </div>
+  </div>
+
+  <!-- ── Toast Notifications ────────────────────────────────────────────────── -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ── Scripts ────────────────────────────────────────────────────────────── -->
+  <script src="js/exercises.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/workout.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
