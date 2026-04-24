@@ -3,6 +3,7 @@ import type { WorkoutPayload } from '../hooks/useWorkoutStorage';
 
 type ProfileResponse = {
   onboardingSeen: boolean;
+  name: string | null;
   experienceLevel: ExperienceLevel | null;
   workoutMode: WorkoutCreationMode | null;
   recommendationGoal: Goal | null;
@@ -48,6 +49,7 @@ export async function fetchProfile(clientId: string) {
 export async function saveProfile(params: {
   clientId: string;
   onboardingSeen: boolean;
+  name?: string;
   experienceLevel?: ExperienceLevel;
   workoutMode?: WorkoutCreationMode;
   recommendation?: {
@@ -60,6 +62,7 @@ export async function saveProfile(params: {
     body: JSON.stringify({
       clientId: params.clientId,
       onboardingSeen: params.onboardingSeen,
+      name: params.name,
       experienceLevel: params.experienceLevel,
       workoutMode: params.workoutMode,
       recommendationGoal: params.recommendation?.goal,

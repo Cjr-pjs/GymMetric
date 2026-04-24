@@ -60,7 +60,7 @@ async function ensureProfile(clientId: string) {
 
   return prisma.userProfile.upsert({
     where: { clientId },
-    create: { clientId },
+    create: { clientId, name: null },
     update: {}
   });
 }
@@ -125,6 +125,7 @@ export async function handleApiRequest(request: IncomingMessage, response: Serve
     sendJson(response, 200, {
       profile: {
         onboardingSeen: profile.onboardingSeen,
+        name: profile.name,
         experienceLevel: profile.experienceLevel,
         workoutMode: profile.workoutMode,
         recommendationGoal: profile.recommendationGoal,
@@ -138,9 +139,15 @@ export async function handleApiRequest(request: IncomingMessage, response: Serve
     const prisma = getPrisma();
     const body = await readBody(request);
     const clientId = typeof body.clientId === 'string' ? body.clientId.trim() : '';
+    const name = typeof body.name === 'string' ? body.name.trim() : undefined;
 
     if (!clientId) {
       sendJson(response, 400, { error: 'clientId e obrigatorio.' });
+      return;
+    }
+
+    if (typeof name === 'string' && !name) {
+      sendJson(response, 400, { error: 'nome e obrigatorio.' });
       return;
     }
 
@@ -148,6 +155,7 @@ export async function handleApiRequest(request: IncomingMessage, response: Serve
       where: { clientId },
       create: {
         clientId,
+        name: name ?? null,
         onboardingSeen: Boolean(body.onboardingSeen),
         experienceLevel: typeof body.experienceLevel === 'string' ? body.experienceLevel : null,
         workoutMode: typeof body.workoutMode === 'string' ? body.workoutMode : null,
@@ -156,6 +164,7 @@ export async function handleApiRequest(request: IncomingMessage, response: Serve
       },
       update: {
         onboardingSeen: Boolean(body.onboardingSeen),
+        ...(typeof name === 'string' ? { name } : {}),
         experienceLevel: typeof body.experienceLevel === 'string' ? body.experienceLevel : null,
         workoutMode: typeof body.workoutMode === 'string' ? body.workoutMode : null,
         recommendationGoal: typeof body.recommendationGoal === 'string' ? body.recommendationGoal : null,
@@ -166,6 +175,7 @@ export async function handleApiRequest(request: IncomingMessage, response: Serve
     sendJson(response, 200, {
       profile: {
         onboardingSeen: profile.onboardingSeen,
+        name: profile.name,
         experienceLevel: profile.experienceLevel,
         workoutMode: profile.workoutMode,
         recommendationGoal: profile.recommendationGoal,

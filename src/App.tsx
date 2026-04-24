@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import { OnboardingModal, type OnboardingResult } from './Components/OnboardingModal';
+import { LoginModal, type LoginResult } from './Components/LoginModal';
 import { Dashboard } from './Components/Dashboard';
 import { WorkoutBuilder } from './Components/WorkoutBuilder';
 import { WorkoutDetails } from './Components/WorkoutDetails';
@@ -10,6 +10,7 @@ import { fetchProfile, saveProfile } from './services/api';
 import type { Goal, Level, WorkoutCreationMode } from './types/workout';
 
 const ONBOARDING_STORAGE_KEY = 'gymmetric_onboarding_seen';
+const USER_NAME_STORAGE_KEY = 'gymmetric_user_name';
 
 function isWorkoutMode(value: string | null): value is WorkoutCreationMode {
   return value === 'manual' || value === 'predefinido';
@@ -29,9 +30,12 @@ function App() {
   const { workouts, loading, addWorkout, updateWorkout, deleteWorkout, getWorkout } = useWorkoutStorage(clientId);
   const [profileLoading, setProfileLoading] = useState(true);
   const [onboardingSeen, setOnboardingSeen] = useState(false);
+  const [userName, setUserName] = useState('');
   const [savingOnboarding, setSavingOnboarding] = useState(false);
   const [recommendation, setRecommendation] = useState<{ goal: Goal; level: Level } | undefined>();
   const [workoutMode, setWorkoutMode] = useState<WorkoutCreationMode>('manual');
+  const displayName = userName.trim();
+  const profileReady = onboardingSeen && Boolean(displayName);
 
   useEffect(() => {
     let active = true;
@@ -44,8 +48,12 @@ function App() {
         }
 
         const seen = profile.onboardingSeen;
-        setOnboardingSeen(seen);
-        localStorage.setItem(ONBOARDING_STORAGE_KEY, seen ? 'true' : 'false');
+        const name = profile.name?.trim() ?? '';
+        const ready = seen && Boolean(name);
+        setOnboardingSeen(ready);
+        setUserName(name);
+        localStorage.setItem(ONBOARDING_STORAGE_KEY, ready ? 'true' : 'false');
+        localStorage.setItem(USER_NAME_STORAGE_KEY, name);
 
         if (isWorkoutMode(profile.workoutMode)) {
           setWorkoutMode(profile.workoutMode);
@@ -64,8 +72,10 @@ function App() {
           return;
         }
 
-        const localSeen = localStorage.getItem(ONBOARDING_STORAGE_KEY) === 'true';
+        const localName = localStorage.getItem(USER_NAME_STORAGE_KEY)?.trim() ?? '';
+        const localSeen = localStorage.getItem(ONBOARDING_STORAGE_KEY) === 'true' && Boolean(localName);
         setOnboardingSeen(localSeen);
+        setUserName(localName);
       } finally {
         if (active) {
           setProfileLoading(false);
@@ -80,26 +90,24 @@ function App() {
     };
   }, [clientId]);
 
-  const handleOnboardingComplete = async (result: OnboardingResult) => {
-    setWorkoutMode(result.workoutMode);
-    setRecommendation(result.recommendation);
+  const handleOnboardingComplete = async (result: LoginResult) => {
     setOnboardingSeen(true);
+    setUserName(result.name);
     localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
+    localStorage.setItem(USER_NAME_STORAGE_KEY, result.name);
 
     try {
       setSavingOnboarding(true);
       await saveProfile({
         clientId,
         onboardingSeen: true,
-        experienceLevel: result.experienceLevel,
-        workoutMode: result.workoutMode,
-        recommendation: result.recommendation
+        name: result.name
       });
     } catch (error) {
       console.error('Erro ao salvar onboarding no banco:', error);
     } finally {
       setSavingOnboarding(false);
-      navigate(result.workoutMode === 'predefinido' ? '/editar-treino' : '/home', { replace: true });
+      navigate('/home', { replace: true });
     }
   };
 
@@ -112,68 +120,85 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to={onboardingSeen ? '/home' : '/onboarding'} replace />} />
-      <Route
-        path="/onboarding"
-        element={
-          onboardingSeen ? (
-            <Navigate to="/home" replace />
-          ) : (
-            <OnboardingModal open onComplete={handleOnboardingComplete} isSubmitting={savingOnboarding} />
-          )
-        }
-      />
-      <Route
-        path="/home"
-        element={
-          onboardingSeen ? <HomeRoute workouts={workouts} loading={loading} /> : <Navigate to="/onboarding" replace />
-        }
-      />
-      <Route
-        path="/editar-treino"
-        element={
-          onboardingSeen ? (
-            <WorkoutEditorRoute
-              recommendation={recommendation}
-              workoutMode={workoutMode}
-              addWorkout={addWorkout}
-              updateWorkout={updateWorkout}
-              getWorkout={getWorkout}
-            />
-          ) : (
-            <Navigate to="/onboarding" replace />
-          )
-        }
-      />
-      <Route
-        path="/editar-treino/:id"
-        element={
-          onboardingSeen ? (
-            <WorkoutEditorRoute
-              recommendation={recommendation}
-              workoutMode={workoutMode}
-              addWorkout={addWorkout}
-              updateWorkout={updateWorkout}
-              getWorkout={getWorkout}
-            />
-          ) : (
-            <Navigate to="/onboarding" replace />
-          )
-        }
-      />
-      <Route
-        path="/treinos/:id"
-        element={
-          onboardingSeen ? (
-            <WorkoutDetailsRoute deleteWorkout={deleteWorkout} getWorkout={getWorkout} />
-          ) : (
-            <Navigate to="/onboarding" replace />
-          )
-        }
-      />
-      <Route path="*" element={<Navigate to={onboardingSeen ? '/home' : '/onboarding'} replace />} />
-    </Routes>
+    <>
+      {profileReady ? <UserBadge name={displayName} /> : null}
+      <Routes>
+        <Route path="/" element={<Navigate to={profileReady ? '/home' : '/onboarding'} replace />} />
+        <Route
+          path="/onboarding"
+          element={
+            profileReady ? (
+              <Navigate to="/home" replace />
+            ) : (
+              <LoginModal open onComplete={handleOnboardingComplete} isSubmitting={savingOnboarding} />
+            )
+          }
+        />
+        <Route
+          path="/home"
+          element={profileReady ? <HomeRoute workouts={workouts} loading={loading} /> : <Navigate to="/onboarding" replace />}
+        />
+        <Route
+          path="/editar-treino"
+          element={
+            profileReady ? (
+              <WorkoutEditorRoute
+                recommendation={recommendation}
+                workoutMode={workoutMode}
+                addWorkout={addWorkout}
+                updateWorkout={updateWorkout}
+                getWorkout={getWorkout}
+              />
+            ) : (
+              <Navigate to="/onboarding" replace />
+            )
+          }
+        />
+        <Route
+          path="/editar-treino/:id"
+          element={
+            profileReady ? (
+              <WorkoutEditorRoute
+                recommendation={recommendation}
+                workoutMode={workoutMode}
+                addWorkout={addWorkout}
+                updateWorkout={updateWorkout}
+                getWorkout={getWorkout}
+              />
+            ) : (
+              <Navigate to="/onboarding" replace />
+            )
+          }
+        />
+        <Route
+          path="/treinos/:id"
+          element={
+            profileReady ? (
+              <WorkoutDetailsRoute deleteWorkout={deleteWorkout} getWorkout={getWorkout} />
+            ) : (
+              <Navigate to="/onboarding" replace />
+            )
+          }
+        />
+        <Route path="*" element={<Navigate to={profileReady ? '/home' : '/onboarding'} replace />} />
+      </Routes>
+    </>
+  );
+}
+
+function UserBadge({ name }: { name: string }) {
+  return (
+    <div className="fixed right-4 top-4 z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-full border border-[#2b3530] bg-[#111513]/90 px-4 py-2 text-[#eaf0ed] shadow-[0_18px_50px_rgba(0,0,0,0.35)] backdrop-blur md:right-6 md:top-6">
+      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1f3029] text-[#7ec09e]">
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-current">
+          <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5Zm0 2c-4.418 0-8 3.134-8 7v1h16v-1c0-3.866-3.582-7-8-7Z" />
+        </svg>
+      </span>
+      <div className="min-w-0">
+        <p className="text-[11px] uppercase tracking-[0.18em] text-[#8e9a95]">Conta</p>
+        <p className="truncate text-sm font-semibold text-[#edf2ef]">{name}</p>
+      </div>
+    </div>
   );
 }
 
