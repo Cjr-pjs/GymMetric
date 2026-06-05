@@ -32,7 +32,7 @@ export function Dashboard({ workouts, onCreateNew, onViewWorkout, loading }: Das
     <div className="min-h-screen bg-app-gradient">
       <div className="mx-auto max-w-7xl px-4 py-8">
         <header className="mb-12 flex flex-col items-center justify-between gap-6 md:flex-row">
-          <div>
+          <div className="text-center md:text-left">
             <h1 className="text-4xl font-bold text-[#e6e6e6]">
               <Link to="/home" className="transition hover:text-[#cfd7ff]">
                 GymMetric
