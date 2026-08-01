@@ -67,6 +67,9 @@ export function ExerciseSelector({
             <option value="peito" disabled={lockLegDay}>
               {exerciseGroupLabels.peito}
             </option>
+            <option value="bracos" disabled={lockLegDay}>
+              {exerciseGroupLabels.bracos}
+            </option>
             <option value="perna" disabled={lockUpperBody}>
               {exerciseGroupLabels.perna}
             </option>

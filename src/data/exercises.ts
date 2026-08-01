@@ -79,6 +79,32 @@ export const exercises = {
       'Panturrilha sentado',
       'Panturrilha no leg press'
     ]
+  },
+
+  bracos: {
+    biceps: [
+      'Rosca Direta (Barra Reta ou Barra W)',
+      'Rosca Alternada com Halteres',
+      'Rosca Inclinada com Halteres (Banco 45°)',
+      'Rosca Scott',
+      'Rosca Martelo'
+    ],
+    triceps: [
+      'Tríceps Testa',
+      'Tríceps Pulley (Barra Reta ou V)',
+      'Tríceps Corda',
+      'Tríceps Francês',
+      'Mergulho nas Paralelas'
+    ],
+    ombros: [
+      'Desenvolvimento com Halteres',
+      'Desenvolvimento com Barra',
+      'Desenvolvimento na Máquina',
+      'Elevação Lateral com Halteres',
+      'Elevação Lateral na Polia',
+      'Crucifixo Invertido (Halteres ou Peck Deck)',
+      'Face Pull'
+    ]
   }
 } as const;
 
@@ -86,12 +112,13 @@ export type MuscleGroup = keyof typeof exercises;
 export type MuscleMode = 'livre' | 'superiores' | 'perna';
 export type WorkoutGoal = 'ganho-massa' | 'forca' | 'emagrecimento' | 'condicionamento' | 'resistencia';
 
-export type ExerciseCategory = keyof typeof exercises.costas | keyof typeof exercises.peito | keyof typeof exercises.perna;
+export type ExerciseCategory = keyof typeof exercises.costas | keyof typeof exercises.peito | keyof typeof exercises.perna | keyof typeof exercises.bracos;
 
 export const exerciseGroupLabels: Record<MuscleGroup, string> = {
   costas: 'Costas',
   peito: 'Peito',
-  perna: 'Perna'
+  perna: 'Perna',
+  bracos: 'Braços'
 };
 
 export const exerciseCatalog = Object.entries(exercises).reduce(

@@ -8,7 +8,7 @@ export type WorkoutTemplate = {
   defaultDays: string[];
   notes: string[];
   suggestedExercises: Array<{
-    group: 'costas' | 'peito' | 'perna';
+    group: 'costas' | 'peito' | 'perna' | 'bracos';
     subcategory: string;
     name: string;
     sets: string;

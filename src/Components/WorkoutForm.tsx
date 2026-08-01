@@ -213,7 +213,7 @@ export function WorkoutForm({ initialRecommendation, initialWorkout, initialWork
           if (isManualMode) {
             if (nextGroup === 'perna') {
               setMode('perna');
-            } else if (nextGroup === 'costas' || nextGroup === 'peito') {
+            } else if (nextGroup === 'costas' || nextGroup === 'peito' || nextGroup === 'bracos') {
               setMode((current) => (current === 'perna' ? 'perna' : 'superiores'));
             }
           } else {
@@ -289,7 +289,7 @@ export function WorkoutForm({ initialRecommendation, initialWorkout, initialWork
 
     const hasMixedGroups =
       exerciseRows.some((row) => row.group === 'perna') &&
-      exerciseRows.some((row) => row.group === 'costas' || row.group === 'peito');
+      exerciseRows.some((row) => row.group === 'costas' || row.group === 'peito' || row.group === 'bracos');
 
     const hasInvalidExercise = exerciseRows.some(
       (exercise) =>
@@ -306,7 +306,7 @@ export function WorkoutForm({ initialRecommendation, initialWorkout, initialWork
     }
 
     if (isManualMode && hasMixedGroups) {
-      nextErrors.exercises = 'Nao e permitido misturar perna com costas/peito.';
+      nextErrors.exercises = 'Nao e permitido misturar perna com costas/peito/bracos.';
     }
 
     setErrors(nextErrors);
@@ -434,7 +434,7 @@ export function WorkoutForm({ initialRecommendation, initialWorkout, initialWork
           {isManualMode && mode !== 'livre' && (
             <div className="mt-4 rounded-xl border border-[#3b4f95] bg-[#1b2238] px-4 py-3 text-sm text-[#c7d5ff]">
               {mode === 'perna'
-                ? 'Treino travado em PERNA. Costas e peito ficam bloqueados.'
+                ? 'Treino travado em PERNA. Costas, peito e bracos ficam bloqueados.'
                 : 'Treino travado em SUPERIORES. Perna fica bloqueado.'}
             </div>
           )}
